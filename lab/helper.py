@@ -1,11 +1,10 @@
 import math
 
 
+def digitos(x): return int(math.floor(math.log10(abs(x))))
 
-digitos = lambda x: int(math.floor(math.log10(abs(x))))
 
-
-arredondar = lambda x, n=1: round(x, -digitos(x)+n-1)
+arredondar = lambda x, n=1: round(x, -digitos(x) + n - 1)
 
 
 def normalizar(media, incerteza, n_alg=1):
@@ -17,22 +16,30 @@ def normalizar(media, incerteza, n_alg=1):
     Retorno: Medida
     """
 
-
     incerteza_norm = arredondar(incerteza, n_alg)
-    media_norm = round(media, -digitos(incerteza_norm)+n_alg-1)
+    media_norm = round(media, -digitos(incerteza_norm) + n_alg - 1)
 
     return (media_norm, incerteza_norm)
+
 
 def formatar_com_erro(media, incerteza, algsig=1):
     """Função que formata uma medida em LaTeX"""
 
-    if incerteza > 1:
+    if incerteza >= 1:
         d = digitos(incerteza)
-        return "$(" + formatar_com_erro(media/pow(10,d-algsig+2), incerteza/pow(10,d-algsig+2), algsig)[1:-1] + ")\\cdot 10^" + ("{{ {} }}" if d > 9 else "{}").format(d+1) + "$"
-    
+        return "$(" + formatar_com_erro(media / pow(10, d - algsig + 2), incerteza / pow(10, d - algsig + 2), algsig)[1:-1] + ")\\cdot 10^" + ("{{ {} }}" if d > 9 else "{}").format(d + 1) + "$"
+
     else:
         norm = normalizar(media, incerteza, algsig)
-        return ("${} \\pm {}$".format(norm[0],norm[1])).replace(".", ",")
+
+        s_media = ("{0:."+ str(-digitos(incerteza)) + "f}").format(norm[0])
+        s_incerteza = ("{0:."+ str(-digitos(incerteza)) + "f}").format(norm[1])
+
+        if len(s_media) - s_media.find(".") - 1 != len(s_incerteza) - 2:
+            s_media += "0" * (s_media.find(".") +
+                              len(s_incerteza) - len(s_media) - 1)
+        return ("${} \\pm {}$".format(s_media, s_incerteza)).replace(".", ",")
+
 
 def iteravel(v):
     try:
@@ -42,7 +49,7 @@ def iteravel(v):
         return False
 
 
-iteravel_vazio = lambda v: not any(True for _ in v)
+def iteravel_vazio(v): return not any(True for _ in v)
 
 
 def matriz(m):
@@ -68,7 +75,8 @@ def matriz(m):
 
 def matriz_iteravel_lista(m):
     if not matriz(m):
-        raise Exception("Argumento inválido <v>: <v> não é uma matriz iterável")
+        raise Exception(
+            "Argumento inválido <v>: <v> não é uma matriz iterável")
 
     saolistas = True and any([isinstance(l, list) for l in m])
 
@@ -82,3 +90,11 @@ def matriz_iteravel_lista(m):
         mat = []
         for l in m:
             mat.append([i for i in l])
+
+def converter_entradas_json(dicionario):
+    """TO-DO"""
+    return
+
+def salvar_tabela(t):
+    """TO-DO"""
+    return
